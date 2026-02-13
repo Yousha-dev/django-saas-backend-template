@@ -1,0 +1,133 @@
+# English translations for Template SaaS Backend.
+# Copyright (C) 2024
+# This file is distributed under the same license as the project.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Template Backend 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"PO-Revision-Date: 2024-01-01 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+# ============================================================================
+# Authentication Messages
+# ============================================================================
+
+msgid "auth.login.success"
+msgstr "Login successful."
+
+msgid "auth.login.invalid_credentials"
+msgstr "Invalid email or password."
+
+msgid "auth.register.success"
+msgstr "Registration successful."
+
+msgid "auth.register.email_exists"
+msgstr "An account with this email already exists."
+
+msgid "auth.logout.success"
+msgstr "Logout successful."
+
+msgid "auth.password_reset.success"
+msgstr "Password reset email sent."
+
+msgid "auth.password_reset.invalid_token"
+msgstr "Invalid or expired password reset token."
+
+msgid "auth.email_verify.success"
+msgstr "Email verified successfully."
+
+msgid "auth.email_verify.invalid_token"
+msgstr "Invalid or expired verification token."
+
+# ============================================================================
+# Subscription Messages
+# ============================================================================
+
+msgid "subscription.created"
+msgstr "Subscription created successfully."
+
+msgid "subscription.cancelled"
+msgstr "Subscription cancelled."
+
+msgid "subscription.renewed"
+msgstr "Subscription renewed successfully."
+
+msgid "subscription.expired"
+msgstr "Your subscription has expired."
+
+msgid "subscription.trial_started"
+msgstr "Trial period has started."
+
+msgid "subscription.upgrade.success"
+msgstr "Plan upgraded successfully."
+
+msgid "subscription.downgrade.success"
+msgstr "Plan downgraded successfully."
+
+# ============================================================================
+# Payment Messages
+# ============================================================================
+
+msgid "payment.success"
+msgstr "Payment processed successfully."
+
+msgid "payment.failed"
+msgstr "Payment failed. Please try again."
+
+msgid "payment.refund.success"
+msgstr "Refund processed successfully."
+
+msgid "payment.refund.failed"
+msgstr "Refund failed."
+
+# ============================================================================
+# Moderation Messages
+# ============================================================================
+
+msgid "moderation.content_flagged"
+msgstr "Content has been flagged for review."
+
+msgid "moderation.content_approved"
+msgstr "Content approved."
+
+msgid "moderation.content_rejected"
+msgstr "Content has been rejected."
+
+msgid "moderation.appeal_submitted"
+msgstr "Appeal submitted successfully."
+
+# ============================================================================
+# General Messages
+# ============================================================================
+
+msgid "error.not_found"
+msgstr "Resource not found."
+
+msgid "error.permission_denied"
+msgstr "You do not have permission to perform this action."
+
+msgid "error.rate_limit"
+msgstr "Too many requests. Please try again later."
+
+msgid "error.validation"
+msgstr "Validation error."
+
+msgid "error.server"
+msgstr "An internal error occurred. Please try again later."
+
+msgid "success.created"
+msgstr "Resource created successfully."
+
+msgid "success.updated"
+msgstr "Resource updated successfully."
+
+msgid "success.deleted"
+msgstr "Resource deleted successfully."

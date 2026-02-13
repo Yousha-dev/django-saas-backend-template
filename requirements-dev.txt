@@ -1,0 +1,161 @@
+# =============================================================================
+# DEVELOPMENT DEPENDENCIES
+# =============================================================================
+# Install with: pip install -r requirements-dev.txt
+#
+# These packages are only needed for development and testing,
+# not for production deployments.
+
+# =============================================================================
+# CODE QUALITY & LINTING
+# =============================================================================
+
+# Ruff - Fast Python linter and formatter (replaces flake8, black, isort)
+ruff>=0.9.0
+
+# Mypy - Static type checker
+mypy>=1.14.0
+
+# Django type stubs
+django-stubs>=5.0.0
+djangorestframework-stubs>=3.15.0
+
+# Type stubs for third-party packages
+types-redis>=4.6.0
+types-requests>=2.32.0
+types-pytz>=2024.2.0
+
+# Bandit - Security linter
+bandit>=1.8.0
+
+# Pycodestyle - Python style guide checker
+pycodestyle>=2.12.0
+
+# Pyflakes - Simple checks for Python errors
+pyflakes>=3.2.0
+
+# Flake8 plugins
+flake8-bugbear>=24.0.0
+flake8-comprehensions>=3.15.0
+flake8-django>=2.0.0
+flake8-tidy-imports>=4.10.0
+flake8-unused-arguments>=0.0.13
+flake8-simplify>=0.21.0
+
+# pylint - Additional code quality checks
+pylint>=3.3.0
+pylint-django>=2.6.0
+
+# =============================================================================
+# FORMATTING
+# =============================================================================
+
+# Black - Code formatter (now using ruff format, but keeping for compatibility)
+black>=24.0.0
+
+# isort - Import sorting (now using ruff, but keeping for compatibility)
+isort>=5.14.0
+
+# autopep8 - Automatic PEP 8 formatting
+autopep8>=2.3.0
+
+# =============================================================================
+# TESTING
+# =============================================================================
+
+# Pytest - Testing framework
+pytest>=8.4.0
+pytest-django>=4.9.0
+pytest-cov>=6.0.0
+pytest-mock>=3.14.0
+pytest-asyncio>=0.24.0
+pytest-xdist>=3.6.0
+pytest-timeout>=2.3.0
+pytest-freezegun>=0.4.2
+factory-boy>=3.3.0
+faker>=30.0.0
+
+# =============================================================================
+# DJANGO DEVELOPMENT TOOLS
+# =============================================================================
+
+# Django Debug Toolbar
+django-debug-toolbar>=4.4.0
+
+# Django Extensions - Shell plus, runscripts, etc.
+# (already in requirements.txt)
+
+# Django Query Inspector - Shows SQL queries in templates
+django-query-inspector>=1.1.0
+
+# Silk - Django profiling/inspection tool
+django-silk>=5.1.0
+
+# =============================================================================
+# PRE-COMMIT HOOKS
+# =============================================================================
+
+pre-commit>=4.1.0
+
+# =============================================================================
+# DOCUMENTATION
+# =============================================================================
+
+# Sphinx - Documentation generator
+sphinx>=8.1.0
+sphinx-rtd-theme>=3.0.0
+
+# pydocstyle - Docstring style checker
+pydocstyle>=6.3.0
+
+# =============================================================================
+# COVERAGE
+# =============================================================================
+
+coverage>=7.6.0
+
+# =============================================================================
+# PROFILING & PERFORMANCE
+# =============================================================================
+
+# py-spy - Sampling profiler for Python
+py-spy>=0.3.14
+
+# memory-profiler - Memory usage profiling
+memory-profiler>=0.61.0
+
+# =============================================================================
+# SECURITY
+# =============================================================================
+
+# safety - Checks for known security vulnerabilities
+safety>=3.2.0
+
+pip-audit>=2.7.0
+
+# =============================================================================
+# IMPORT ORGANIZATION
+# =============================================================================
+
+# importlib-metadata - Better import metadata (for debugging)
+importlib-metadata>=8.0.0
+
+# =============================================================================
+# MISC UTILITIES
+# =============================================================================
+
+# rich - Terminal formatting for better output
+rich>=13.9.0
+
+# typer - CLI building (useful for management commands)
+typer>=0.15.0
+
+# icecream - Better debugging print statements
+icecream>=2.1.3
+
+# =============================================================================
+# SHELL & DOCKER LINTING
+# =============================================================================
+
+# shellcheck - Shell script linting (via pre-commit)
+# hadolint - Dockerfile linting (via pre-commit)

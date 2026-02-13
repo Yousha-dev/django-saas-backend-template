@@ -1,0 +1,309 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "template-backend"
+version = "0.1.0"
+description = "Template Backend API"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Template Team" }]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Web Environment",
+    "Framework :: Django",
+    "Framework :: Django :: 5.0",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "django>=5.0,<5.1",
+    "djangorestframework",
+    "djangorestframework-simplejwt",
+    "django-cors-headers",
+    "django-redis",
+    "channels",
+    "channels_redis",
+    "django-celery-beat",
+    "django-celery-results",
+    "celery",
+    "stripe",
+    "drf-yasg",
+    "django-extensions",
+    "python-dotenv",
+    "psycopg2-binary",
+    "redis",
+    "gunicorn",
+    "uvicorn",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff",
+    "black",
+    "isort",
+    "mypy",
+    "django-stubs",
+    "djangorestframework-stubs",
+    "pytest",
+    "pytest-django",
+    "pytest-cov",
+    "pytest-mock",
+    "pytest-asyncio",
+    "pre-commit",
+    "django-debug-toolbar",
+]
+
+
+# =============================================================================
+# RUFF CONFIGURATION
+# =============================================================================
+[tool.ruff]
+# Same as Black
+line-length = 88
+indent-width = 4
+
+# Target Python version
+target-version = "py310"
+
+# Scan source files
+src = ["src"]
+
+# Exclude common directories
+exclude = [
+    ".git",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "*.pyc",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".ruff_cache",
+    "build",
+    "dist",
+    "migrations",
+]
+
+[tool.ruff.lint]
+# Enable pycodestyle (E, W), Pyflakes (F), isort (I), and more
+select = [
+    "E",     # pycodestyle errors
+    "W",     # pycodestyle warnings
+    "F",     # pyflakes
+    "I",     # isort
+    "B",     # flake8-bugbear
+    "C4",    # flake8-comprehensions
+    "DJ",    # flake8-django
+    "UP",    # pyupgrade
+    "ARG",   # flake8-unused-arguments
+    "SIM",   # flake8-simplify
+    "TID",   # flake8-tidy-imports
+    "N",     # pep8-naming
+    "S",     # flake8-bandit (security)
+    "RUF",   # ruff-specific rules
+    "ASYNC", # flake8-async
+]
+
+# Ignore specific rules
+ignore = [
+    "E501",   # line too long (handled by formatter)
+    "S101",   # assert used (allow asserts in tests)
+    "S608",   # SQL injection via string concatenation (false positives in Django)
+    "DJ001",  # django views with similar names (false positives)
+    "ARG001", # unused function argument (common in Django views)
+    "ARG002", # unused method argument
+    "N806",   # variable in function should be lowercase (common for API/JSON keys)
+    "RUF012", # mutable class attributes (Django uses this pattern)
+]
+
+# Allow autofix for all enabled rules (when `--fix` is provided)
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when prefixed with underscore
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+# Tests can have more relaxed rules
+"**/tests/**/*.py" = [
+    "S101",    # allow asserts
+    "S106",    # allow hardcoded test passwords
+    "S605",    # allow subprocess with shell
+    "S607",    # allow partial executable path
+    "B017",    # allow pytest.raises(Exception)
+    "ARG",     # allow unused arguments in test fixtures
+    "PLR2004", # allow magic values in tests
+    "RUF034",  # allow useless if-else in test utilities
+]
+# Migrations are auto-generated
+"**/migrations/*.py" = ["ALL"]
+# Django settings files use star imports by convention
+"**/configuration/settings/development.py" = ["F403", "F405"]
+"**/configuration/settings/production.py" = ["F403", "F405"]
+"**/configuration/settings/staging.py" = ["F403", "F405"]
+"**/configuration/settings/test.py" = ["F403", "F405"]
+# models.py re-exports from models package + unmanaged proxy models
+"**/myapp/models.py" = ["F403", "F405", "DJ008"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["configuration", "myapp"]
+known-third-party = ["django", "rest_framework", "celery", "stripe"]
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "first-party",
+    "local-folder",
+]
+
+
+# =============================================================================
+# BLACK CONFIGURATION
+# =============================================================================
+[tool.black]
+line-length = 88
+target-version = ['py310', 'py311', 'py312']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | venv
+  | __pycache__
+  | migrations
+  | build
+  | dist
+)/
+'''
+
+
+# =============================================================================
+# ISORT CONFIGURATION
+# =============================================================================
+[tool.isort]
+profile = "black"
+line_length = 88
+known_first_party = ["configuration", "myapp"]
+known_third_party = ["django", "rest_framework", "celery", "stripe"]
+skip = ["migrations", ".venv", "venv"]
+skip_glob = ["**/migrations/*.py"]
+
+
+# =============================================================================
+# MYPY CONFIGURATION
+# =============================================================================
+[tool.mypy]
+python_version = "3.10"
+plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+    "celery.*",
+    "stripe.*",
+    "channels.*",
+    "channels_redis.*",
+    "django_celery_beat.*",
+    "django_celery_results.*",
+    "drf_yasg.*",
+]
+ignore_missing_imports = true
+
+[tool.django-stubs]
+django_settings_module = "configuration.settings"
+
+
+# =============================================================================
+# PYTEST CONFIGURATION
+# =============================================================================
+[tool.pytest.ini_options]
+minversion = "7.0"
+DJANGO_SETTINGS_MODULE = "configuration.settings"
+python_files = ["test_*.py", "*_test.py", "tests.py"]
+python_functions = ["test_*"]
+python_classes = ["Test*"]
+addopts = [
+    "--cov=src",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-fail-under=80",
+    "--strict-markers",
+    "--reuse-sp",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+testpaths = ["src/tests"]
+django_find_project = false
+
+
+# =============================================================================
+# COVERAGE CONFIGURATION
+# =============================================================================
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/migrations/*",
+    "*/tests/*",
+    "*/__pycache__/*",
+    "*/venv/*",
+    "*/.venv/*",
+    "manage.py",
+    "*/wsgi.py",
+    "*/asgi.py",
+    "*/conftest.py",
+]
+branch = true
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+fail_under = 80
+
+
+# =============================================================================
+# BANDIT CONFIGURATION (Security Linting)
+# =============================================================================
+[tool.bandit]
+exclude_dirs = ["src/tests", "src/**/migrations"]
+skips = ["B101", "B601"]
+
+
+# =============================================================================
+# DJANGO-LINT CONFIGURATION
+# =============================================================================
+[tool.djlint]
+profile = "django"
+indent = 4
+max_line_length = 120
+format_css = true
+format_js = true
+ignore = "H006,H030,H031"

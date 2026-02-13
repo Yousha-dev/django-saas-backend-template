@@ -1,0 +1,133 @@
+# Spanish translations for Template SaaS Backend.
+# Copyright (C) 2024
+# This file is distributed under the same license as the project.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Template Backend 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"PO-Revision-Date: 2024-01-01 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+# ============================================================================
+# Authentication Messages
+# ============================================================================
+
+msgid "auth.login.success"
+msgstr "Inicio de sesión exitoso."
+
+msgid "auth.login.invalid_credentials"
+msgstr "Correo electrónico o contraseña inválidos."
+
+msgid "auth.register.success"
+msgstr "Registro exitoso."
+
+msgid "auth.register.email_exists"
+msgstr "Ya existe una cuenta con este correo electrónico."
+
+msgid "auth.logout.success"
+msgstr "Cierre de sesión exitoso."
+
+msgid "auth.password_reset.success"
+msgstr "Correo de restablecimiento de contraseña enviado."
+
+msgid "auth.password_reset.invalid_token"
+msgstr "Token de restablecimiento de contraseña inválido o expirado."
+
+msgid "auth.email_verify.success"
+msgstr "Correo electrónico verificado exitosamente."
+
+msgid "auth.email_verify.invalid_token"
+msgstr "Token de verificación inválido o expirado."
+
+# ============================================================================
+# Subscription Messages
+# ============================================================================
+
+msgid "subscription.created"
+msgstr "Suscripción creada exitosamente."
+
+msgid "subscription.cancelled"
+msgstr "Suscripción cancelada."
+
+msgid "subscription.renewed"
+msgstr "Suscripción renovada exitosamente."
+
+msgid "subscription.expired"
+msgstr "Su suscripción ha expirado."
+
+msgid "subscription.trial_started"
+msgstr "El período de prueba ha comenzado."
+
+msgid "subscription.upgrade.success"
+msgstr "Plan actualizado exitosamente."
+
+msgid "subscription.downgrade.success"
+msgstr "Plan degradado exitosamente."
+
+# ============================================================================
+# Payment Messages
+# ============================================================================
+
+msgid "payment.success"
+msgstr "Pago procesado exitosamente."
+
+msgid "payment.failed"
+msgstr "El pago falló. Por favor, inténtelo de nuevo."
+
+msgid "payment.refund.success"
+msgstr "Reembolso procesado exitosamente."
+
+msgid "payment.refund.failed"
+msgstr "El reembolso falló."
+
+# ============================================================================
+# Moderation Messages
+# ============================================================================
+
+msgid "moderation.content_flagged"
+msgstr "El contenido ha sido marcado para revisión."
+
+msgid "moderation.content_approved"
+msgstr "Contenido aprobado."
+
+msgid "moderation.content_rejected"
+msgstr "El contenido ha sido rechazado."
+
+msgid "moderation.appeal_submitted"
+msgstr "Apelación enviada exitosamente."
+
+# ============================================================================
+# General Messages
+# ============================================================================
+
+msgid "error.not_found"
+msgstr "Recurso no encontrado."
+
+msgid "error.permission_denied"
+msgstr "No tiene permiso para realizar esta acción."
+
+msgid "error.rate_limit"
+msgstr "Demasiadas solicitudes. Por favor, inténtelo más tarde."
+
+msgid "error.validation"
+msgstr "Error de validación."
+
+msgid "error.server"
+msgstr "Ocurrió un error interno. Por favor, inténtelo más tarde."
+
+msgid "success.created"
+msgstr "Recurso creado exitosamente."
+
+msgid "success.updated"
+msgstr "Recurso actualizado exitosamente."
+
+msgid "success.deleted"
+msgstr "Recurso eliminado exitosamente."

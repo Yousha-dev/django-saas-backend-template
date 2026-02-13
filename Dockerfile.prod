@@ -1,0 +1,103 @@
+# Multi-stage production build optimized for caching and layer reduction
+# Using Python 3.12 slim and build cache for faster builds
+
+FROM python:3.12-slim AS builder
+
+# Set build-time environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_DEFAULT_TIMEOUT=100 \
+    PIP_BREAK_SYSTEM_IFS_MODIFIED=1
+
+# Set working directory
+WORKDIR /src
+
+# Install build dependencies first
+RUN pip install --no-cache-dir pip setuptools wheel
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+
+# Install application dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Production stage
+FROM python:3.12-slim AS production
+
+# Set build-time environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+# Create non-root user for security
+RUN groupadd -g 1001 template && \
+    useradd -u 1001 -g template -s /bin/bash -m template
+
+# Set working directory
+WORKDIR /app
+
+# Copy Python dependencies from builder
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+# Copy application source
+COPY --chown=template:template src/ /app/
+
+# Create directories with proper permissions
+RUN mkdir -p /app/uploads /app/logs /app/media /app/staticfiles /var/log/django /var/log/gunicorn /var/log/celery && \
+    chown -R template:template /app/uploads /app/logs /app/media /app/staticfiles /var/log && \
+    chmod 755 /app/uploads /app/logs /app/media /app/staticfiles /var/log
+
+# Install gunicorn for production ASGI server
+RUN pip install --no-cache-dir gunicorn==24.0.0 gevent==24.0.0
+
+# Create entrypoint script
+RUN echo '#!/bin/bash\n\
+set -e\n\
+\
+echo "Waiting for database..."\n\
+until nc -z ${DB_HOST:-db} ${DB_PORT_NUMBER:-5432}; do\n\
+    echo "Database is unavailable - sleeping"\n\
+    sleep 1\n\
+done\n\
+echo "Database is up"\n\
+\
+echo "Running migrations..."\n\
+python manage.py migrate --noinput\n\
+\
+echo "Collecting static files..."\n\
+python manage.py collectstatic --noinput\n\
+\
+echo "Starting Gunicorn..."\n\
+exec gunicorn configuration.wsgi:application \\\n\
+    --bind 0.0.0.0:8000 \\\n\
+    --workers 4 \\\n\
+    --worker-class gevent \\\n\
+    --worker-connections 1000 \\\n\
+    --threads 4 \\\n\
+    --timeout 120 \\\n\
+    --keepalive 5 \\\n\
+    --max-requests 1000 \\\n\
+    --access-logfile /var/log/gunicorn/access.log \\\n\
+    --error-logfile /var/log/gunicorn/error.log \\\n\
+    --log-level info\n\
+' > /usr/local/bin/entrypoint.sh && chmod +x /usr/local/bin/entrypoint.sh
+
+# Set environment variables
+ENV DJANGO_ENV=production \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health/')" || exit 1
+
+# Expose port
+EXPOSE 8000
+
+# Run as non-root user
+USER template
+
+# Startup command
+CMD ["/usr/local/bin/entrypoint.sh"]

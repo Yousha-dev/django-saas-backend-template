@@ -1,0 +1,353 @@
+# Template Backend - Production Docker Compose Configuration
+# Optimized for production deployment with security best practices
+
+services:
+  # =========================================================================
+  # PostgreSQL Database
+  # =========================================================================
+  db:
+    image: postgres:16-alpine
+    container_name: template-db
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          memory: 1G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+      options:
+        - shm-size=262144k
+        - shm-rw-only=true
+
+  # =========================================================================
+  # Redis - Cache and Channels
+  # =========================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: template-redis
+    restart: always
+    command: >
+      redis-server --save
+      --appendonly
+      --aof-sync-rate-limit
+      1000
+      --timeout 300
+    sysctls:
+      - no-new-privileges:true
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  # =========================================================================
+  # RabbitMQ - Message Broker for Celery
+  # =========================================================================
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    container_name: template-rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+      RABBITMQ_DATASOURCE_PASSWORD: ${RABBITMQ_PASSWORD}
+    hostname: template-rabbitmq
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 60s
+      timeout: 15s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 256M
+        reservations:
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # =========================================================================
+  # Django Web Application
+  # =========================================================================
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+      args:
+        SECRET_KEY: ${SECRET_KEY}
+        DEBUG: "False"
+        DB_HOST: db
+        DB_PORT_NUMBER: "5432"
+        REDIS_HOST: redis
+        REDIS_PORT_NUMBER: "6379"
+        RABBITMQ_HOST: rabbitmq
+        RABBITMQ_PORT_NUMBER: "5672"
+        DJANGO_ENV: production
+    image: template-backend:latest
+    container_name: template-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    env_file:
+      - .env.prod
+    environment:
+      <<: *app_environment
+    volumes:
+      - app_uploads:/app/uploads
+      - app_logs:/app/logs
+      - static_files:/app/staticfiles
+      - media_files:/app/media
+    networks:
+      - backend-network
+    ports:
+      - "${DJANGO_PORT}:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "curl", "-f", "http://localhost:8000/api/health/"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1G
+        reservations:
+          memory: 2G
+      logging:
+        driver: "json-file"
+        options:
+          max-size: "20m"
+          max-file: "10"
+    ulimits:
+      - nofile: 65536
+      - nproc: 65536
+
+  # =========================================================================
+  # Celery Worker - Background Task Processing
+  # =========================================================================
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+      args:
+        SECRET_KEY: ${SECRET_KEY}
+        DEBUG: "False"
+        DB_HOST: db
+        DB_PORT_NUMBER: "5432"
+        REDIS_HOST: redis
+        REDIS_PORT_NUMBER: "6379"
+        RABBITMQ_HOST: rabbitmq
+        RABBITMQ_PORT_NUMBER: "5672"
+        BROKER_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672//
+        CELERY_BROKER_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672//
+        CELERY_RESULT_BACKEND: redis://:${REDIS_PASSWORD}@redis:6379/0
+    image: template-backend:latest
+    container_name: template-celery-worker
+    restart: always
+    command: celery -A configuration worker worker --loglevel=info --concurrency=4 --max-tasks-per-child=1000 --max-tasks-memory-child=131072 --time-limit=300 --soft-time-limit=240 --prefetch-multiplier=4
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
+    env_file:
+      - .env.prod
+    environment:
+      <<: *app_environment
+    networks:
+      - backend-network
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          memory: 4G
+      logging:
+        driver: "json-file"
+        options:
+          max-size: "20m"
+          max-file: "5"
+    healthcheck:
+      test: ["CMD-SHELL", "celery", "inspect"]
+      interval: 60s
+      timeout: 15s
+      retries: 3
+    scale:
+      - min: 2
+      - max: 8
+      - target: 80% cpu
+
+  # =========================================================================
+  # Celery Beat - Scheduled Tasks
+  # =========================================================================
+  celery_beat:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+      args:
+        SECRET_KEY: ${SECRET_KEY}
+        DEBUG: "False"
+        DB_HOST: db
+        DB_PORT_NUMBER: "5432"
+        REDIS_HOST: redis
+        REDIS_PORT_NUMBER: "6379"
+        RABBITMQ_HOST: rabbitmq
+        RABBITMQ_PORT_NUMBER: "5672"
+        BROKER_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672//
+        CELERY_BROKER_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672//
+        CELERY_RESULT_BACKEND: redis://:${REDIS_PASSWORD}@redis:6379/1
+    image: template-backend:latest
+    container_name: template-celery-beat
+    restart: always
+    command: celery -A configuration beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
+    env_file:
+      - .env.prod
+    environment:
+      <<: *app_environment
+    networks:
+      - backend-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          memory: 1G
+      logging:
+        driver: "json-file"
+        options:
+          max-size: "10m"
+          max-file: "2"
+
+  # =========================================================================
+  # Flower - Celery Monitoring
+  # =========================================================================
+  flower:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+      args:
+        SECRET_KEY: ${SECRET_KEY}
+        DEBUG: "False"
+        REDIS_HOST: redis
+        REDIS_PORT_NUMBER: "6379"
+        CELERY_BROKER_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672//
+        CELERY_RESULT_BACKEND: redis://:${REDIS_PASSWORD}@redis:6379/0
+    image: template-backend:latest
+    container_name: template-flower
+    restart: always
+    command: celery -A configuration flower --port=5555 --broker=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672//
+    ports:
+      - "5555:5555"
+    env_file:
+      - .env.prod
+    environment:
+      <<: *app_environment
+      - FLOWER_PORT: "5555"
+    networks:
+      - backend-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+        reservations:
+          memory: 256M
+
+networks:
+  backend-network:
+    driver: bridge
+
+volumes:
+  pgdata:
+  redis_data:
+  rabbitmq_data:
+  app_uploads:
+  app_logs:
+  static_files:
+  media_files:
+
+# Health checks define service dependencies
+healthcheck:
+  db:
+    test: ["CMD-SHELL", "pg_isready"]
+    interval: 10s
+    timeout: 5s
+    retries: 3
+  redis:
+    test: ["CMD", "redis-cli", "ping"]
+  rabbitmq:
+    test: ["CMD", "rabbitmq-diagnostics", "ping"]
+  celery_worker:
+    test: ["CMD", "celery"]
+  celery_beat:
+    test: ["CMD", "celery"]
+  web:
+    test: ["CMD", "curl", "-f", "http://localhost:8000/api/health/"]
+
+# Auto-scaling enabled (requires proper infrastructure configuration)
+# web:
+#   deploy:
+#     replicas: 3
+#     placement:
+#       max_replicas_per_node: 3
+#       update_config:
+#         parallelism: 2
+#       delay: 10s
