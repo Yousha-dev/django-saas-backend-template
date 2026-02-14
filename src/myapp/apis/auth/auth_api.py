@@ -332,7 +332,7 @@ class RegisterUserSubscriptionAPI(APIView):
             # if float(payment_amount) > 0 and not stripe_enabled:
             #     return Response({
             #         'error': 'Payment processing is currently disabled. Please contact support to complete your subscription.',
-            #         'support_email': 'support@duedoom.com',
+            #         'support_email': 'support@template.com',
             #         'service_status': 'disabled'
             #     }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
@@ -951,7 +951,7 @@ class SendEmailAPI(APIView):
             openapi.Parameter(
                 "to_email",
                 openapi.IN_FORM,
-                description="Recipient email(s) (optional, defaults to support@duedoom.com)",
+                description="Recipient email(s) (optional, defaults to support@template.com)",
                 type=openapi.TYPE_STRING,
                 required=False,
             ),

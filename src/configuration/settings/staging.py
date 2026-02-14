@@ -68,7 +68,7 @@ for key, value in security_settings.items():
 ALLOWED_HOSTS = get_allowed_hosts(debug=False)
 
 # Add staging-specific domains
-# ALLOWED_HOSTS += ['staging.yourdomain.com', 'staging.duedoom.com']
+# ALLOWED_HOSTS += ['staging.yourdomain.com', 'staging.template.com']
 
 # =============================================================================
 # EMAIL

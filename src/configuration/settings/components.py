@@ -74,7 +74,7 @@ def get_database_settings() -> dict:
     return {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.environ.get("DB_NAME", "duedoom"),
+            "NAME": os.environ.get("DB_NAME", "template"),
             "USER": os.environ.get("DB_USER", "postgres"),
             "PASSWORD": os.environ.get("DB_PASSWORD", "postgres"),
             "HOST": os.environ.get("DB_HOST", "db" if is_docker else "localhost"),
@@ -156,7 +156,7 @@ def get_cache_settings(redis_url: str) -> dict:
                 "SOCKET_TIMEOUT": 5,
                 "CONNECTION_POOL_KWARGS": {"max_connections": 50},
             },
-            "KEY_PREFIX": "duedoom",
+            "KEY_PREFIX": "template",
             "VERSION": 1,
         },
     }
@@ -297,7 +297,7 @@ def get_cors_settings(debug: bool = False) -> dict:
     # Production origins - should come from environment
     production_origins = env_origins or [
         # Add your production domains here
-        "https://*.duedoom.com",
+        "https://*.template.com",
     ]
 
     if debug:
@@ -437,9 +437,9 @@ def get_email_settings() -> dict:
         "EMAIL_USE_SSL": _get_env_bool("EMAIL_USE_SSL", False),
         "EMAIL_TIMEOUT": _get_env_int("EMAIL_TIMEOUT", 30),
         "DEFAULT_FROM_EMAIL": os.environ.get(
-            "DEFAULT_FROM_EMAIL", "noreply@duedoom.com"
+            "DEFAULT_FROM_EMAIL", "noreply@template.com"
         ),
-        "SERVER_EMAIL": os.environ.get("SERVER_EMAIL", "server@duedoom.com"),
+        "SERVER_EMAIL": os.environ.get("SERVER_EMAIL", "server@template.com"),
     }
 
 

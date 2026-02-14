@@ -82,7 +82,7 @@ class EmailHelper:
             subject (str): Email subject
             message (str): Plain text message
             recipient_list (List[str]): List of recipient email addresses
-            from_email (Optional[str]): Sender email address. Defaults to support@duedoom.com
+            from_email (Optional[str]): Sender email address. Defaults to support@template.com
             html_message (Optional[str]): HTML version of the message
             attachments (Optional[List]): List of file paths to attach
             cc (Optional[List[str]]): List of CC recipient email addresses
@@ -122,7 +122,7 @@ class EmailHelper:
             subject (str): Email subject
             message (str): Plain text message
             recipient_list (List[str]): List of recipient email addresses
-            from_email (Optional[str]): Sender email address. Defaults to support@duedoom.com
+            from_email (Optional[str]): Sender email address. Defaults to support@template.com
             html_message (Optional[str]): HTML version of the message
             attachments (Optional[List]): List of file paths to attach
             cc (Optional[List[str]]): List of CC recipient email addresses

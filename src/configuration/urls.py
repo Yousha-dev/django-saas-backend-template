@@ -39,7 +39,7 @@ schema_view = get_schema_view(
         default_version="v1",
         description="API documentation for the backend.",
         terms_of_service="https://www.google.com/policies/terms/",
-        contact=openapi.Contact(email="support@duedoom.com"),
+        contact=openapi.Contact(email="support@template.com"),
         license=openapi.License(name="BSD License"),
     ),
     public=True,
