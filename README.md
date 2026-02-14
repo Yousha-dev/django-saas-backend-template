@@ -119,7 +119,7 @@ Request → SecurityMiddleware → CORS → Session → Locale → Common → CS
 ## Project Structure
 
 ```
-Template-Backend/
+django-saas-backend-template/
 ├── docker-compose.yml          # Infrastructure services (PostgreSQL, Redis, RabbitMQ)
 ├── docker-compose.prod.yml     # Production Docker Compose
 ├── Dockerfile                  # Application Docker image
@@ -238,8 +238,8 @@ Template-Backend/
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-org/template-backend.git
-cd template-backend
+git clone https://github.com/Yousha-dev/django-saas-backend-template.git
+cd django-saas-backend-template
 
 # 2. (Optional) Create a virtual environment
 python -m venv venv
